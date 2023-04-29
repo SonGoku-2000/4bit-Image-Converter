@@ -103,15 +103,30 @@ def funcPalette(img: Image, debug):
     return paleta
 
 
-def funcImage(img: Image, debug):
+def funcImage(img: Image.Image, debug):
     inicio = time.time()
     imgArr = np.asarray(img)
-    imgArr = imgArr.copy()
     imgArr = np.flip(imgArr)
 
+    if img.width <= 16:
+        nCeros = 1
+
+        while img.width > nCeros:
+            nCeros *= 2
+    else:
+        cont = 2
+        nCeros = 16
+        while img.width > nCeros:
+            cont += 1
+            nCeros = 8 * cont
+    
+    nCeros = nCeros - img.width
+    aux = []
     for i in range(len(imgArr)):
-        imgArr[i] = np.flip(imgArr[i])
-    imgArr = imgArr.flatten()
+        aux.extend(np.flip(imgArr[i]).tolist())
+        aux.extend([0 for i in range(nCeros)])
+
+    imgArr = aux
 
     aux1 = "0x"
     aux2 = []
@@ -190,20 +205,20 @@ def process(args: argparse.Namespace):
             print("Processing:", imgPath, end="\n\n")
 
         with Image.open(imgPath) as img:
-            converter4Bit(img, outputPath.joinpath(Path(imgPath).name),
+            converter4Bit(img, outputPath.joinpath(Path(imgPath).stem + ".bmp"),
                           args.progress)
 
     for imgForderPath in imgFoldersPaths:
         for imgPath in Path(imgForderPath).glob("*.*"):
-            if (imgPath.suffix.lower not in [".bmp",".png",".jpg",".jpeg"]):
+            if (imgPath.suffix.lower() not in [".bmp",".png",".jpg",".jpeg"]):
                 continue
-
+            
             if args.verbose:
                 print("Processing:", imgPath, end="\n\n")
 
             outputPath.joinpath(imgForderPath).mkdir(exist_ok=True)
             with Image.open(imgPath) as img:
-                converter4Bit(img, outputPath.joinpath(imgPath),
+                converter4Bit(img, outputPath.joinpath(imgForderPath).joinpath(imgPath.stem + ".bmp"),
                               args.progress)
 
 
@@ -216,5 +231,5 @@ if __name__ == "__main__":
                         help='Output folder for the images.')
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-p', '--progress', action='store_true')
-    args = parser.parse_args()
+    args = parser.parse_args(["--dirs","img2.bmp","--output","o"])
     process(args)
