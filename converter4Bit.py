@@ -142,7 +142,7 @@ def funcImage(img: Image.Image, debug):
     return imgArr
 
 
-def converter4Bit(img: Image, dest="archivo.bmp", debug=False):
+def converter4Bit(img: Image, dest="archivo.bmp", quantize=False, debug=False):
     """
     Parameters
     ----------
@@ -150,13 +150,18 @@ def converter4Bit(img: Image, dest="archivo.bmp", debug=False):
         The image that be to convert to 4bpp image
     dest : str, default "archivo.bmp"
         The name of the  output image
+    quantize : bool, False
+        Use pillow's quantize method instead of convert method for reduce colors
     debug : bool, default False
         Print the steps and the progres of the conversion
     """
 
-    img = img.convert("P",
-                      palette=Image.Palette.ADAPTIVE,
-                      colors=16)
+    if quantize:
+        img = img.quantize(16)
+    else:
+        img = img.convert("P",
+                          palette=Image.Palette.ADAPTIVE,
+                          colors=16)
 
     primeraParte = funcFirstPart(debug)
 
@@ -184,8 +189,9 @@ def process(args: argparse.Namespace):
            argsparse that contains the folowing args:\n
            dirs: [str, str, ...], 
            output: str, 
-           verbose:bool, 
-           progress:bool
+           verbose: bool, 
+           progress: bool,
+           quantize: bool
     """
 
     outputPath = Path(args.output)
@@ -206,6 +212,7 @@ def process(args: argparse.Namespace):
 
         with Image.open(imgPath) as img:
             converter4Bit(img, outputPath.joinpath(Path(imgPath).stem + ".bmp"),
+                          args.quantize,
                           args.progress)
 
     for imgForderPath in imgFoldersPaths:
@@ -219,6 +226,7 @@ def process(args: argparse.Namespace):
             outputPath.joinpath(imgForderPath).mkdir(exist_ok=True)
             with Image.open(imgPath) as img:
                 converter4Bit(img, outputPath.joinpath(imgForderPath).joinpath(imgPath.stem + ".bmp"),
+                              args.quantize,
                               args.progress)
 
 
@@ -231,5 +239,7 @@ if __name__ == "__main__":
                         help='Output folder for the images.')
     parser.add_argument('--verbose', '-v', action='store_true')
     parser.add_argument('--progress', '-p',  action='store_true')
+    parser.add_argument('-q', '--quantize', action='store_true',
+                        help="Use pillow's quantize method instead of convert method for reduce colors")
     args = parser.parse_args()
     process(args)
