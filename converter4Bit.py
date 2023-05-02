@@ -67,7 +67,7 @@ def funcSize(img: Image, debug):
 def funcSecondPart(debug):
     inicio = time.time()
 
-    segundaParte = "00 01 00 04  00 00 00 00 00 20 00  00 00 00 00  00 00 00 00  00 00 10 00 00 00 00 00  00 00"
+    segundaParte = "00 01 00 04  00 00 00 00 00 20 00  00 00 00 00  00 00 00 00  00 00 00 00 00 00 00 00  00 00"
     segundaParte = stringToHex(segundaParte)
 
     fin = time.time()
@@ -119,7 +119,7 @@ def funcImage(img: Image.Image, debug):
         while img.width > nCeros:
             cont += 1
             nCeros = 8 * cont
-    
+
     nCeros = nCeros - img.width
     aux = []
     for i in range(len(imgArr)):
@@ -187,7 +187,7 @@ def process(args: argparse.Namespace):
            verbose:bool, 
            progress:bool
     """
-    
+
     outputPath = Path(args.output)
     outputPath.mkdir(exist_ok=True)
     imgPaths = []
@@ -210,9 +210,9 @@ def process(args: argparse.Namespace):
 
     for imgForderPath in imgFoldersPaths:
         for imgPath in Path(imgForderPath).glob("*.*"):
-            if (imgPath.suffix.lower() not in [".bmp",".png",".jpg",".jpeg"]):
+            if (imgPath.suffix.lower() not in [".bmp", ".png", ".jpg", ".jpeg"]):
                 continue
-            
+
             if args.verbose:
                 print("Processing:", imgPath, end="\n\n")
 
@@ -225,11 +225,11 @@ def process(args: argparse.Namespace):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Converter for 8bit bmp to 4bit bmp, that is similar to the usenti output.',
                                      epilog="This is not too eficient and could be improbed, but works.")
-    parser.add_argument('--dirs', required=True, type=str,nargs='+', 
+    parser.add_argument('--dirs', '-d', required=True, type=str, nargs='+',
                         help='Relative paths for images or folders with images to convert, separed with a space ex: --dirs img1.bmp path1/')
-    parser.add_argument('--output', required=True,
+    parser.add_argument('--output', '-o', required=True,
                         help='Output folder for the images.')
-    parser.add_argument('-v', '--verbose', action='store_true')
-    parser.add_argument('-p', '--progress', action='store_true')
+    parser.add_argument('--verbose', '-v', action='store_true')
+    parser.add_argument('--progress', '-p',  action='store_true')
     args = parser.parse_args()
     process(args)
