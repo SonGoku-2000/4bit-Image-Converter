@@ -150,7 +150,7 @@ def funcImage(img: Image.Image, debug):
     rowSize = (((4 * img.width)+31)//32)*4
     rowSize *= 2
     nCeros = rowSize - img.width
-    
+
     aux = []
     for i in range(len(imgArr)):
         aux.extend(np.flip(imgArr[i]).tolist())
@@ -261,7 +261,7 @@ def process(args: argparse.Namespace):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Converter for 8bit bmp to 4bit bmp, that is similar to the usenti output.',
+    parser = argparse.ArgumentParser(description='Converter for 8bit bmp to 4bit bmp, that is similar to the usenti output. For some errors use --quantize option',
                                      epilog="This is not too eficient and could be improbed, but works.")
     parser.add_argument('--dirs', '-d', required=True, type=str, nargs='+',
                         help='Relative paths for images or folders with images to convert, separed with a space ex: --dirs img1.bmp path1/')
@@ -269,7 +269,7 @@ if __name__ == "__main__":
                         help='Output folder for the images.')
     parser.add_argument('--verbose', '-v', action='store_true')
     parser.add_argument('--progress', '-p',  action='store_true')
-    parser.add_argument('-q', '--quantize', action='store_true',
+    parser.add_argument('--quantize', '-q',  action='store_true',
                         help="Use pillow's quantize method instead of convert method for reduce colors")
-    args = parser.parse_args(['-o', 'o', '-d', 'img5.bmp'])
+    args = parser.parse_args()
     process(args)
